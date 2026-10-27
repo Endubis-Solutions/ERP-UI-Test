@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Executive Console · Mad Vervet Hostels</title>
+    <meta
+      name="description"
+      content="Mad Vervet Hostels executive ERP console — consolidated financial summary, departmental margins, PMS sync health and AI discrepancy alerts."
+    />
+    <meta name="color-scheme" content="dark" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%2310b981'/%3E%3Cpath d='M8 24V12l8-4.5 8 4.5v12h-5.5v-6.5h-5V24H8Z' fill='%230f172a'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body class="min-h-full bg-slate-900 font-sans text-gray-300">
+    <div class="pointer-events-none fixed inset-0 -z-10 ambient"></div>
+    <div class="pointer-events-none fixed inset-x-0 top-0 -z-10 h-[560px] opacity-40 grid-lines"></div>
+
+    <div id="sidebar-overlay" class="fixed inset-0 z-30 hidden bg-slate-950/70 backdrop-blur-sm lg:hidden"></div>
+
+    <!-- SIDEBAR -->
+    <aside
+      id="sidebar"
+      class="fixed inset-y-0 left-0 z-40 flex w-[272px] -translate-x-full flex-col border-r border-white/[0.06] bg-slate-900/95 backdrop-blur-xl transition-transform duration-300 ease-out lg:translate-x-0"
+      aria-label="Primary navigation"
+    >
+      <div class="flex h-16 shrink-0 items-center gap-3 border-b border-white/[0.06] px-4">
+        <div
+          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 shadow-lg shadow-emerald-500/25"
+        >
+          <svg viewBox="0 0 24 24" class="h-5 w-5 text-slate-950" fill="currentColor" aria-hidden="true">
+            <path d="M4 20V7.5L12 3l8 4.5V20h-5.5v-6.5h-5V20H4Z" />
+          </svg>
+        </div>
+        <div class="min-w-0">
+          <p class="truncate text-sm font-semibold tracking-tight text-white">Mad Vervet</p>
+          <p class="text-[9px] font-semibold uppercase tracking-[0.28em] text-slate-500">Hostels</p>
+        </div>
+        <span
+          class="ml-auto rounded-md border border-emerald-400/20 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-emerald-300"
+          >Exec</span
+        >
+      </div>
+
+      <div class="relative px-3 pt-4">
+        <p class="label px-1 pb-2">Location context</p>
+        <button
+          id="location-button"
+          type="button"
+          class="flex w-full items-center gap-2.5 rounded-xl border border-white/[0.07] bg-slate-800/50 px-2.5 py-2.5 text-left transition hover:border-white/15 hover:bg-slate-800"
+          aria-haspopup="listbox"
+          aria-expanded="false"
+          aria-controls="location-menu"
+        >
+          <span
+            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sky-500/10 text-sky-300 ring-1 ring-inset ring-sky-400/20"
+          >
+            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M3 12h18M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18Z" />
+            </svg>
+          </span>
+          <span class="min-w-0 flex-1">
+            <span id="location-label" class="block truncate text-[13px] font-semibold text-white">Global</span>
+            <span id="location-region" class="block truncate text-[11px] text-slate-500">Consolidated · 3 properties</span>
+          </span>
+          <svg
+            id="location-chevron"
+            viewBox="0 0 24 24"
+            class="h-4 w-4 shrink-0 text-slate-500 transition-transform duration-200"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            aria-hidden="true"
+          >
+            <path d="m6 9 6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <div
+          id="location-menu"
+          role="listbox"
+          aria-label="Select location"
+          class="absolute left-3 right-3 top-[calc(100%+6px)] z-40 hidden overflow-hidden rounded-xl border border-white/10 bg-slate-800 p-1.5 shadow-2xl shadow-black/60"
+        ></div>
+      </div>
+
+      <nav class="mt-5 flex-1 overflow-y-auto px-3 pb-4 no-scrollbar" aria-label="Workspace">
+        <p class="label px-2 pb-2">Workspace</p>
+        <div class="space-y-1">
+          <button type="button" class="nav-item nav-item-active" data-view="summary" aria-current="page">
+            <svg viewBox="0 0 24 24" class="nav-icon h-[18px] w-[18px] shrink-0" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+              <path d="M4 13h6V4H4v9Zm0 7h6v-4H4v4Zm10 0h6v-9h-6v9Zm0-12h6V4h-6v4Z" stroke-linejoin="round" />
+            </svg>
+            <span class="flex-1 text-left">Executive Summary</span>
+            <span class="rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-emerald-300">Live</span>
+          </button>
+
+          <button type="button" class="nav-item" id="revenue-toggle" aria-expanded="true" aria-controls="revenue-subnav">
+            <svg viewBox="0 0 24 24" class="nav-icon h-[18px] w-[18px] shrink-0" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+              <path d="M4 20V10m5 10V4m5 16v-7m5 7V8" stroke-linecap="round" />
+            </svg>
+            <span class="flex-1 text-left">Revenue Streams</span>
+            <svg
+              viewBox="0 0 24 24"
+              class="h-3.5 w-3.5 rotate-90 text-slate-500 transition-transform duration-200"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              id="revenue-chevron"
+              aria-hidden="true"
+            >
+              <path d="m9 18 6-6-6-6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </button>
+
+          <div id="revenue-subnav" class="ml-[26px] space-y-0.5 border-l border-white/[0.07] pl-3">
+            <button type="button" class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs text-slate-500 transition hover:bg-white/5 hover:text-gray-200" data-view="revenue" data-department="bar">
+              <span class="h-1.5 w-1.5 rounded-full bg-amber-400/80"></span>Bar
+            </button>
+            <button type="button" class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs text-slate-500 transition hover:bg-white/5 hover:text-gray-200" data-view="revenue" data-department="restaurant">
+              <span class="h-1.5 w-1.5 rounded-full bg-orange-400/80"></span>Restaurant
+            </button>
+            <button type="button" class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs text-slate-500 transition hover:bg-white/5 hover:text-gray-200" data-view="revenue" data-department="events">
+              <span class="h-1.5 w-1.5 rounded-full bg-violet-400/80"></span>Events
+            </button>
+            <button type="button" class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs text-slate-500 transition hover:bg-white/5 hover:text-gray-200" data-view="revenue" data-department="laundry">
+              <span class="h-1.5 w-1.5 rounded-full bg-cyan-400/80"></span>Laundry
+            </button>
+            <button type="button" class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs text-slate-500 transition hover:bg-white/5 hover:text-gray-200" data-view="revenue" data-department="tours">
+              <span class="h-1.5 w-1.5 rounded-full bg-emerald-400/80"></span>Tours
+            </button>
+          </div>
+          <button type="button" class="nav-item" data-view="ledger">
+            <svg viewBox="0 0 24 24" class="nav-icon h-[18px] w-[18px] shrink-0" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="16" rx="2" />
+              <path d="M3 10h18M9 10v10M15 10v10" stroke-linecap="round" />
+            </svg>
+            <span class="flex-1 text-left">Finance Ledger</span>
+            <span class="rounded-full bg-white/[0.04] px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-slate-400">Raw</span>
+          </button>
+
+          <button type="button" class="nav-item" data-view="sync">
+            <svg viewBox="0 0 24 24" class="nav-icon h-[18px] w-[18px] shrink-0" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+              <path d="M20 11a8 8 0 1 0-.6 4M20 5v6h-6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <span class="flex-1 text-left">PMS Sync Status</span>
+            <span class="flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-emerald-300">
+              <span class="ticker-dot"></span>OK
+            </span>
+          </button>
+
+          <button type="button" class="nav-item" data-view="settings">
+            <svg viewBox="0 0 24 24" class="nav-icon h-[18px] w-[18px] shrink-0" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+              <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" />
+              <circle cx="9" cy="6" r="2" />
+              <circle cx="15" cy="12" r="2" />
+              <circle cx="7" cy="18" r="2" />
+            </svg>
+            <span class="flex-1 text-left">AI Settings</span>
+          </button>
+        </div>
+
+        <div class="mt-6 rounded-xl border border-white/[0.06] bg-gradient-to-br from-slate-800/80 to-slate-800/30 p-3.5">
+          <div class="flex items-center gap-2">
+            <svg viewBox="0 0 24 24" class="h-4 w-4 text-emerald-300" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <path d="m12 3 1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3Z" stroke-linejoin="round" />
+            </svg>
+            <p class="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-200">AI engine</p>
+            <span class="ml-auto flex items-center gap-1 text-[10px] text-emerald-300">
+              <span class="ticker-dot"></span>Learning
+            </span>
+          </div>
+          <p class="mt-2 text-[11px] leading-relaxed text-slate-500">
+            <span id="ai-pattern-count">24</span> patterns trained · verve-fin-v3
+          </p>
+          <div class="mt-2.5 h-1 overflow-hidden rounded-full bg-slate-700/60">
+            <div class="h-full w-[68%] rounded-full bg-gradient-to-r from-emerald-400/80 to-teal-300/80"></div>
+          </div>
+        </div>
+      </nav>
+
+      <div class="shrink-0 border-t border-white/[0.06] p-3">
+        <button type="button" class="flex w-full items-center gap-2.5 rounded-xl px-2 py-2 text-left transition hover:bg-white/[0.04]" data-action="profile">
+          <span class="flex h-8 w-8 items-center justify-center rounded-full bg-slate-700 text-[11px] font-semibold text-gray-200 ring-1 ring-inset ring-white/10">AK</span>
+          <span class="min-w-0 flex-1">
+            <span class="block truncate text-xs font-medium text-gray-200">Amara Kimani</span>
+            <span class="block truncate text-[10px] text-slate-500">Group Finance Lead</span>
+          </span>
+          <svg viewBox="0 0 24 24" class="h-4 w-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="m6 9 6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+    </aside>
+
+    <div class="lg:pl-[272px]">
+      <!-- HEADER -->
+      <header class="sticky top-0 z-30 border-b border-white/[0.06] bg-slate-900/80 backdrop-blur-xl">
+        <div class="flex h-16 items-center gap-2.5 px-4 sm:gap-4 sm:px-6">
+          <button id="menu-button" type="button" class="icon-btn shrink-0 lg:hidden" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">
+            <svg viewBox="0 0 24 24" class="h-[18px] w-[18px]" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
+            </svg>
+          </button>
+
+          <div class="relative w-full max-w-[440px]">
+            <div
+              class="flex items-center gap-2 rounded-xl border border-white/[0.07] bg-slate-800/60 px-3 py-2 transition focus-within:border-emerald-400/40 focus-within:bg-slate-800 focus-within:ring-2 focus-within:ring-emerald-400/15"
+            >
+              <svg viewBox="0 0 24 24" class="h-4 w-4 shrink-0 text-slate-500" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-3.2-3.2" stroke-linecap="round" />
+              </svg>
+              <input
+                id="search-input"
+                type="search"
+                role="combobox"
+                aria-expanded="false"
+                aria-controls="search-results"
+                aria-label="Global search"
+                autocomplete="off"
+                placeholder="Search departments, alerts, transactions…"
+                class="w-full min-w-0 bg-transparent text-[13px] text-gray-200 placeholder:text-slate-500 focus:outline-none"
+              />
+              <kbd class="hidden shrink-0 rounded border border-white/10 bg-white/[0.04] px-1.5 py-0.5 text-[10px] font-medium text-slate-500 sm:block">⌘K</kbd>
+            </div>
+            <div
+              id="search-results"
+              role="listbox"
+              aria-label="Search results"
+              class="absolute left-0 right-0 top-[calc(100%+8px)] hidden max-h-[420px] overflow-y-auto rounded-xl border border-white/10 bg-slate-800 p-1.5 shadow-2xl shadow-black/60 no-scrollbar"
+            ></div>
+          </div>
+
+          <div class="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
+            <button
+              type="button"
+              data-view="sync"
+              class="hidden items-center gap-2 rounded-full border border-white/[0.07] bg-white/[0.03] px-3 py-1.5 text-[11px] text-slate-400 transition hover:border-white/15 hover:bg-white/[0.06] hover:text-gray-200 sm:inline-flex"
+              title="Open PMS sync status"
+            >
+              <span class="ticker-dot"></span>
+              <span class="hidden md:inline">Last synced with PMS:</span>
+              <span id="sync-relative" class="font-medium text-gray-300">2 mins ago</span>
+            </button>
+
+            <div class="hidden h-8 w-px bg-white/[0.07] md:block"></div>
+
+            <div class="hidden text-right md:block">
+              <p id="header-date" class="text-[11px] font-medium leading-tight text-gray-200">Tue, 27 Oct 2026</p>
+              <p class="text-[10px] leading-tight text-slate-500 tabular">
+                <span id="header-clock">14:32:08</span> <span id="header-tz">EAT</span>
+              </p>
+            </div>
+
+            <div class="relative">
+              <button
+                id="bell-button"
+                type="button"
+                class="icon-btn relative"
+                aria-label="Notifications"
+                aria-haspopup="true"
+                aria-expanded="false"
+                aria-controls="notification-menu"
+              >
+                <svg viewBox="0 0 24 24" class="h-[18px] w-[18px]" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                  <path d="M18 8a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M10.3 20a2 2 0 0 0 3.4 0" stroke-linecap="round" />
+                </svg>
+                <span id="notification-dot" class="absolute right-2.5 top-2 h-1.5 w-1.5 rounded-full bg-rose-400 ring-2 ring-slate-900"></span>
+              </button>
+              <div
+                id="notification-menu"
+                class="absolute right-0 top-[calc(100%+10px)] hidden w-[318px] overflow-hidden rounded-xl border border-white/10 bg-slate-800 shadow-2xl shadow-black/60"
+              >
+                <div class="flex items-center justify-between border-b border-white/[0.06] px-3.5 py-2.5">
+                  <p class="text-xs font-semibold text-white">Notifications</p>
+                  <span class="rounded-full bg-rose-500/15 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-rose-300">3 new</span>
+                </div>
+                <div class="divide-y divide-white/[0.05]">
+                  <button type="button" class="flex w-full gap-2.5 px-3.5 py-3 text-left transition hover:bg-white/[0.04]" data-notification="alert">
+                    <span class="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-rose-400"></span>
+                    <span>
+                      <span class="block text-[12px] font-medium text-gray-200">Bar inventory variance flagged</span>
+                      <span class="mt-0.5 block text-[11px] leading-snug text-slate-500">4 units short against POS · 07:42</span>
+                    </span>
+                  </button>
+                  <button type="button" class="flex w-full gap-2.5 px-3.5 py-3 text-left transition hover:bg-white/[0.04]" data-notification="sync">
+                    <span class="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400"></span>
+                    <span>
+                      <span class="block text-[12px] font-medium text-gray-200">MarketMan feed recovered</span>
+                      <span class="mt-0.5 block text-[11px] leading-snug text-slate-500">2 count sheets still pending review</span>
+                    </span>
+                  </button>
+                  <button type="button" class="flex w-full gap-2.5 px-3.5 py-3 text-left transition hover:bg-white/[0.04]" data-notification="brief">
+                    <span class="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-sky-400"></span>
+                    <span>
+                      <span class="block text-[12px] font-medium text-gray-200">Morning brief is ready</span>
+                      <span class="mt-0.5 block text-[11px] leading-snug text-slate-500">94% confidence · generated 06:12</span>
+                    </span>
+                  </button>
+                </div>
+                <button type="button" class="w-full border-t border-white/[0.06] px-3.5 py-2.5 text-[11px] font-medium text-emerald-300 transition hover:bg-white/[0.04] hover:text-emerald-200" data-action="all-alerts">
+                  Open discrepancy log
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="mx-auto w-full max-w-[1680px] px-4 py-6 sm:px-6 lg:py-8">
+        <div id="content-grid" class="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_356px]">
+          <!-- MAIN -->
+          <main id="main-content" class="min-w-0 space-y-6">
+            <section data-view="summary" class="space-y-6 animate-fade-up">
+              <div class="flex flex-wrap items-end justify-between gap-4">
+                <div class="min-w-0">
+                  <nav class="flex items-center gap-1.5 text-[11px] text-slate-500" aria-label="Breadcrumb">
+                    <span>Executive</span>
+                    <svg viewBox="0 0 24 24" class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <path d="m9 18 6-6-6-6" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <span class="text-gray-300">Summary</span>
+                  </nav>
+                  <h1 class="mt-2 text-[22px] font-semibold tracking-tight text-white sm:text-2xl">Yesterday at a glance</h1>
+                  <p class="mt-1 text-[13px] text-slate-400">
+                    Consolidated performance for <span id="period-label" class="text-gray-200">26 Oct 2026</span>
+                    <span class="px-1 text-slate-600">·</span>
+                    <span id="property-label">3 properties</span>
+                  </p>
+                </div>
+                <div class="flex shrink-0 items-center gap-2">
+                  <div class="hidden items-center gap-1.5 rounded-lg border border-white/[0.07] bg-white/[0.03] px-2.5 py-2 text-[11px] text-slate-400 sm:flex">
+                    <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                      <rect x="4" y="5" width="16" height="16" rx="2" />
+                      <path d="M8 3v4M16 3v4M4 10h16" stroke-linecap="round" />
+                    </svg>
+                    <span id="range-label">Yesterday · 26 Oct</span>
+                  </div>
+                  <button type="button" class="btn" data-action="export">
+                    <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                      <path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    Export
+                  </button>
+                  <button type="button" class="btn-primary" data-action="sync">
+                    <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                      <path d="M20 11a8 8 0 1 0-.6 4M20 5v6h-6" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    Sync PMS
+                  </button>
+                </div>
+              </div>
+
+              <div id="brief-slot"></div>
+
+              <section aria-labelledby="dept-heading">
+                <div class="mb-3 flex flex-wrap items-end justify-between gap-3">
+                  <div>
+                    <h2 id="dept-heading" class="text-sm font-semibold text-white">Departmental performance</h2>
+                    <p class="mt-0.5 text-xs text-slate-500">Gross income, logged expenses and net margin · yesterday</p>
+                  </div>
+                  <div class="flex flex-wrap items-center gap-3">
+                    <div id="kpi-summary" class="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px]"></div>
+                    <button type="button" class="btn" data-view="ledger">
+                      <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                        <rect x="3" y="4" width="18" height="16" rx="2" />
+                        <path d="M3 10h18M9 10v10M15 10v10" stroke-linecap="round" />
+                      </svg>
+                      Raw data
+                    </button>
+                  </div>
+                </div>
+                <div id="kpi-grid" class="grid gap-4 sm:grid-cols-2"></div>
+              </section>
+            </section>
+
+            <section data-view="revenue" class="hidden space-y-6 animate-fade-up"></section>
+            <section data-view="ledger" class="hidden space-y-6 animate-fade-up"></section>
+            <section data-view="sync" class="hidden space-y-6 animate-fade-up"></section>
+            <section data-view="settings" class="hidden space-y-6 animate-fade-up"></section>
+
+            <footer class="flex flex-col items-start justify-between gap-2 border-t border-white/[0.06] pt-4 text-[11px] text-slate-600 sm:flex-row sm:items-center">
+              <p>Mad Vervet Hostels · Executive Console <span class="text-slate-500">v2.4</span></p>
+              <p class="flex items-center gap-1.5">
+                <span class="h-1 w-1 rounded-full bg-slate-600"></span>
+                Read-only mirror of PMS · figures unaudited
+              </p>
+            </footer>
+          </main>
+
+          <!-- RIGHT RAIL -->
+          <aside
+            id="right-rail"
+            class="min-w-0 xl:sticky xl:top-[84px] xl:max-h-[calc(100vh-104px)] xl:overflow-y-auto xl:pr-1 no-scrollbar"
+            aria-label="Financial health and discrepancy alerts"
+          >
+            <div class="space-y-4">
+              <div id="health-slot"></div>
+
+              <div class="flex items-end justify-between gap-3 px-1 pt-1">
+                <div>
+                  <h2 id="alerts-heading" class="flex items-center gap-2 text-sm font-semibold text-white">
+                    Discrepancy alerts
+                    <span id="alert-count" class="rounded-full bg-rose-500/15 px-1.5 py-0.5 text-[10px] font-bold text-rose-300 tabular">4</span>
+                  </h2>
+                  <p class="mt-0.5 text-[11px] text-slate-500">
+                    AI triage · updated <span data-sync-relative>2 mins ago</span>
+                  </p>
+                </div>
+                <div class="segmented shrink-0" role="group" aria-label="Filter alerts">
+                  <button type="button" data-alert-filter="all" aria-pressed="true">All</button>
+                  <button type="button" data-alert-filter="high" aria-pressed="false">High</button>
+                  <button type="button" data-alert-filter="medium" aria-pressed="false">Med</button>
+                </div>
+              </div>
+
+              <div id="alerts-feed" class="space-y-3"></div>
+
+              <button type="button" class="btn w-full" data-action="all-alerts">
+                Full discrepancy log
+                <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                  <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </button>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <!-- FLOATING AI ASSISTANT -->
+    <div id="chat-widget" class="fixed bottom-4 right-4 z-50 w-[calc(100vw-2rem)] max-w-[392px] sm:bottom-6 sm:right-6">
+      <section
+        id="chat-panel"
+        class="overflow-hidden rounded-2xl border border-white/10 bg-slate-900/95 shadow-2xl shadow-black/70 ring-1 ring-inset ring-white/[0.04] backdrop-blur-xl"
+        aria-label="AI assistant"
+      >
+        <div class="relative flex items-center gap-2.5 border-b border-white/[0.06] bg-gradient-to-r from-emerald-500/[0.12] via-slate-800/40 to-slate-900/10 px-3.5 py-3">
+          <span class="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400/25 to-teal-500/10 text-emerald-300 ring-1 ring-inset ring-emerald-400/25">
+            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+              <path d="m12 3 1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3Z" stroke-linejoin="round" />
+              <path d="M18.5 15.5l.8 1.9 1.9.8-1.9.8-.8 1.9-.8-1.9-1.9-.8 1.9-.8.8-1.9Z" stroke-linejoin="round" />
+            </svg>
+            <span class="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-emerald-400 ring-2 ring-slate-900"></span>
+          </span>
+          <div class="min-w-0 flex-1">
+            <p class="text-xs font-semibold text-white">Mad Vervet AI</p>
+            <p class="flex items-center gap-1 text-[10px] text-emerald-300/90">
+              <span class="h-1 w-1 rounded-full bg-emerald-400"></span>Online · reads live PMS data
+            </p>
+          </div>
+          <button
+            id="chat-minimize"
+            type="button"
+            class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition hover:bg-white/5 hover:text-gray-200"
+            aria-label="Minimise assistant"
+          >
+            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M5 12h14" stroke-linecap="round" />
+            </svg>
+          </button>
+          <button
+            id="chat-close"
+            type="button"
+            class="inline-flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition hover:bg-white/5 hover:text-gray-200"
+            aria-label="Close assistant"
+          >
+            <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="m6 6 12 12M18 6 6 18" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+
+        <div
+          id="chat-messages"
+          class="max-h-[286px] min-h-[180px] space-y-4 overflow-y-auto px-4 py-4 no-scrollbar"
+          role="log"
+          aria-live="polite"
+          aria-label="Conversation with Mad Vervet AI"
+        ></div>
+
+        <div id="chat-chips" class="flex gap-1.5 overflow-x-auto px-4 pb-2.5 no-scrollbar"></div>
+
+        <form id="chat-form" class="border-t border-white/[0.06] p-3" autocomplete="off">
+          <div
+            class="flex items-end gap-2 rounded-xl border border-white/10 bg-slate-800/80 p-1.5 pl-3 transition focus-within:border-emerald-400/40 focus-within:ring-2 focus-within:ring-emerald-400/15"
+          >
+            <textarea
+              id="chat-input"
+              rows="1"
+              placeholder="Ask the ERP anything (margins, summaries, discrepancies)…"
+              aria-label="Ask the ERP anything"
+              class="max-h-24 w-full flex-1 resize-none bg-transparent py-1.5 text-[12.5px] leading-relaxed text-gray-200 placeholder:text-slate-500 focus:outline-none"
+            ></textarea>
+            <button
+              type="submit"
+              class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/25 transition hover:bg-emerald-400 active:scale-95"
+              aria-label="Send message"
+            >
+              <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M4 12 20 4l-4 16-4-6-8-2Z" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </button>
+          </div>
+          <p class="mt-1.5 px-1 text-[10px] text-slate-600">Answers use live PMS data · verify before posting to the ledger.</p>
+        </form>
+      </section>
+    </div>
+
+    <button
+      id="chat-fab"
+      type="button"
+      class="fixed bottom-4 right-4 z-50 hidden h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 text-slate-950 shadow-2xl shadow-emerald-500/30 ring-1 ring-white/20 transition hover:scale-105 active:scale-95 sm:bottom-6 sm:right-6"
+      aria-label="Open AI assistant"
+    >
+      <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+        <path d="m12 3 1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3Z" stroke-linejoin="round" />
+        <path d="M18.5 15.5l.8 1.9 1.9.8-1.9.8-.8 1.9-.8-1.9-1.9-.8 1.9-.8.8-1.9Z" stroke-linejoin="round" />
+      </svg>
+      <span class="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[9px] font-bold text-white ring-2 ring-slate-900">2</span>
+    </button>
+
+    <!-- ALERT DRAWER -->
+    <div id="alert-drawer" class="fixed inset-0 z-[60] hidden" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="drawer-title">
+      <div id="drawer-backdrop" class="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"></div>
+      <div class="absolute inset-y-0 right-0 flex w-full max-w-md">
+        <div id="drawer-panel" class="drawer-panel" role="document"></div>
+      </div>
+    </div>
+
+    <!-- TOASTS -->
+    <div
+      id="toast-region"
+      class="pointer-events-none fixed left-1/2 top-20 z-[70] flex w-[calc(100vw-2rem)] max-w-sm -translate-x-1/2 flex-col items-center gap-2"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
+  </body>
+</html>

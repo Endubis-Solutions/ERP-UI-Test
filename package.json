@@ -1,0 +1,25 @@
+{
+  "name": "mad-vervet-executive-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Executive ERP dashboard for Mad Vervet Hostels — financial summary, activity aggregator and AI discrepancy engine.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build:css": "tailwindcss -i ./src/input.css -o ./public/css/styles.css --minify",
+    "watch:css": "tailwindcss -i ./src/input.css -o ./public/css/styles.css --watch",
+    "validate": "node tools/validate.js",
+    "smoke": "node tools/smoke.js",
+    "shot": "node tools/shot.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}
