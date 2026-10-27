@@ -16,18 +16,60 @@ npm start              # http://localhost:3000
 Use `npm run watch:css` while iterating on markup/classes (Tailwind JIT picks up classes in
 `public/index.html` and `public/app.js`).
 
+## Deploy to Netlify
+
+Netlify serves static files only, so the Express server is replaced by one bundled function that
+exposes the **same `/api/*` paths**. The client keeps calling relative URLs, so `public/app.js`
+needs no environment-specific config.
+
+```powershell
+# 1. connect the repo in Netlify → "Add new site" → "Import an existing project"
+# 2. Netlify reads netlify.toml: build "npm run build", publish "public",
+#    functions "netlify/functions" and Node 20 — no dashboard overrides needed
+# 3. deploy (no environment variables required)
+```
+
+What `netlify.toml` wires up:
+
+| Setting | Value | Why |
+| --- | --- | --- |
+| build command | `npm run build` → `build:css` | Tailwind `styles.css` is compiled at deploy time |
+| publish | `public` | `index.html`, `app.js`, `css/styles.css` |
+| functions | `netlify/functions` | single handler `api.js` |
+| rewrite | `/api/*` → `/.netlify/functions/api/:splat` | keeps every client fetch path identical |
+| rewrite | `/*` → `/index.html` | SPA fallback |
+| headers | `no-cache` for `styles.css`/`app.js`/`index.html`, security headers | assets are not fingerprinted |
+
+The mock dataset is generated in memory, so only the mutable demo state (last sync, sync events,
+trained patterns, training log) is snapshotted into **Netlify Blobs** between invocations; without a
+Blobs context the function falls back to per-instance memory. Posting/ledger data stays
+deterministic and reconciles exactly as it does locally.
+
+Test the serverless path without deploying:
+
+```powershell
+npm run test:fn      # drives netlify/functions/api.js with Lambda-style events
+npm run preview:fn   # serves public/ + the function on :3100 (the deployed topology)
+$env:APP_URL='http://localhost:3100/'; node tools/smoke.js   # same 41 assertions
+npx netlify dev      # real Netlify CLI; proxies to server.js (see [dev] in netlify.toml)
+```
+
 ## Layout
 
 ```
-server.js              Express app: static assets + JSON API + SPA fallback
+server.js              Express app: static assets + JSON API + SPA fallback (local dev)
 server/data.js         Mock PMS dataset (3 properties), alert lifecycle, sync + training state
 server/assistant.js    Deterministic "AI" reply engine (numbers grounded in the active dataset)
+netlify.toml           Netlify build/publish/functions config, /api rewrite, headers
+netlify/functions/api.js  Serverless mirror of the Express API (same /api/* routes)
 public/index.html      Shell markup, view sections, drawer/chat/overlay scaffolding
 public/app.js          Client: fetch, render, state, events, keyboard + aria behaviour
 src/input.css          Tailwind entry (@tailwind base/components/utilities + custom layers)
 tools/validate.js      Static contract check (DOM ids, icon keys, declared functions)
 tools/smoke.js         Headless-Chrome end-to-end smoke run over CDP
 tools/shot.js          Screenshot capture (desktop, drawer, revenue, ledger, mobile)
+tools/function-test.js Lambda-event harness for the Netlify function
+tools/netlify-sim.js   Static + function server that mimics Netlify routing
 ```
 
 ## API
@@ -66,7 +108,9 @@ Seed data lives in `server/data.js`; the client never hard-codes financial figur
 
 ```powershell
 npm run validate                     # static: ids / icons / function contract
-# headless Chrome on port 9222, then:
+npm run test:fn                      # Netlify function: all routes, no deploy needed
+npm run preview:fn                   # static + /api function on :3100 (deployed topology)
+# headless Chrome on port 9222, then (APP_URL works for both servers):
 node tools/smoke.js                  # live end-to-end assertions, fails on console errors
 node tools/shot.js                   # writes .shot-*.png for visual review
 ```

@@ -1,4 +1,5 @@
 node_modules/
+.netlify/
 
 # Local screenshots and generated artifacts
 .shot-*.png

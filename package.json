@@ -7,16 +7,21 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
+    "dev:netlify": "netlify dev",
+    "build": "npm run build:css",
     "build:css": "tailwindcss -i ./src/input.css -o ./public/css/styles.css --minify",
     "watch:css": "tailwindcss -i ./src/input.css -o ./public/css/styles.css --watch",
     "validate": "node tools/validate.js",
     "smoke": "node tools/smoke.js",
-    "shot": "node tools/shot.js"
+    "shot": "node tools/shot.js",
+    "test:fn": "node tools/function-test.js",
+    "preview:fn": "node tools/netlify-sim.js"
   },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
+    "@netlify/blobs": "^10.7.13",
     "express": "^4.19.2"
   },
   "devDependencies": {

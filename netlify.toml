@@ -1,0 +1,55 @@
+[build]
+  command = "npm run build"
+  publish = "public"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--no-audit --no-fund"
+
+[functions]
+  node_bundler = "esbuild"
+
+# The client only ever calls relative /api/* URLs, so this rewrite keeps the
+# exact same fetch paths used against the local Express server.
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
+
+# Single-page shell: unknown paths fall back to the dashboard.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# styles.css and app.js are not fingerprinted, so never cache them hard.
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    cache-control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/app.js"
+  [headers.values]
+    cache-control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    cache-control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "SAMEORIGIN"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+
+# `netlify dev` proxies to the Express server so local behaviour is unchanged.
+[dev]
+  command = "node server.js"
+  targetPort = 3000
+  port = 8888

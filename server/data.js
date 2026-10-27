@@ -1167,8 +1167,59 @@ function forceSync() {
   };
 }
 
+/**
+ * Serialisable snapshot of the mutable demo state (last sync, sync events,
+ * trained patterns, training log). Used by the Netlify function to persist
+ * state between invocations; the Express server keeps everything in memory.
+ */
+let stateUpdatedAt = 0;
+
+function snapshotState() {
+  stateUpdatedAt = Date.now();
+  return {
+    updatedAt: stateUpdatedAt,
+    lastSyncAt: lastSyncAt.toISOString(),
+    syncEvents: SYNC_EVENTS.map((event) => ({ ...event })),
+    trainedPatterns: Array.from(trainedPatterns),
+    trainingLog: trainingLog.map((entry) => ({ ...entry })),
+  };
+}
+
+function hydrateState(state) {
+  if (!state || typeof state !== 'object') return false;
+  const updatedAt = Number(state.updatedAt) || 0;
+  if (updatedAt <= stateUpdatedAt) return false;
+
+  const nextSync = state.lastSyncAt ? new Date(state.lastSyncAt) : null;
+  if (nextSync && !Number.isNaN(nextSync.getTime())) lastSyncAt = nextSync;
+
+  if (Array.isArray(state.syncEvents) && state.syncEvents.length) {
+    SYNC_EVENTS.length = 0;
+    state.syncEvents.slice(0, 6).forEach((event) => {
+      if (event && event.label) SYNC_EVENTS.push({ ...event });
+    });
+  }
+
+  trainedPatterns.clear();
+  if (Array.isArray(state.trainedPatterns)) {
+    state.trainedPatterns.slice(0, 200).forEach((key) => trainedPatterns.add(String(key)));
+  }
+
+  trainingLog.length = 0;
+  if (Array.isArray(state.trainingLog)) {
+    state.trainingLog.slice(0, 25).forEach((entry) => {
+      if (entry && entry.key) trainingLog.push({ ...entry });
+    });
+  }
+
+  stateUpdatedAt = updatedAt;
+  return true;
+}
+
 module.exports = {
   LOCATIONS,
+  snapshotState,
+  hydrateState,
   getDashboard,
   getLedger,
   markExpected,

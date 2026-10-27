@@ -6,7 +6,7 @@
  */
 
 const BASE = 'http://127.0.0.1:9222';
-const APP = 'http://localhost:3000/';
+const APP = process.env.APP_URL || 'http://localhost:3000/';
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function main() {
